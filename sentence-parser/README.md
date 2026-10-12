@@ -1,32 +1,57 @@
-# React + TypeScript + Vite
+# 考研英语长难句交互练习系统 (Sentence Parser)
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+这是一个专为考研英语（主要针对英语二，兼顾英语一）设计的长难句结构拆分与翻译练习工具。
 
-Currently, two official plugins are available:
+## 设计理念：解决“认知超载”
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+很多同学在练习长难句时，试图**一边划分句子结构，一边在脑海中组织中文翻译**。根据**认知负荷理论 (Cognitive Load Theory)**，这两种任务需要消耗极大的大脑工作记忆。同时进行会导致大脑“死机”，两边都做不好，严重影响学习效果。
 
-## React Compiler
+为了解决这个问题，本系统采用了**分步支架式教学 (Scaffolding)**，将复杂的任务解耦为三个独立的阶段。强迫你在专注于翻译之前，先百分之百地搞懂句子结构。
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 如何使用本系统？
 
-## Expanding the Oxlint configuration
+本系统的练习流程严格分为三个阶段：
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+### 阶段一：结构拆分 (Chunking)
+- **任务**：找到句子的意群边界（寻找连词、介词、非谓语动词等断句标志）。
+- **操作**：将鼠标悬停在句子中任意两个单词之间，会出现红色的 `/` 符号。点击即可在该位置切断句子。如果不小心点错了，再次点击红色的 `/` 即可取消切分。
+- **目的**：专注于句子的物理结构划分，完全不需要考虑中文意思。
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
-```
+### 阶段二：成分标记 (Tagging)
+- **进入**：完成阶段一的拆分后，点击右下角的“完成拆分，进入标记”按钮。
+- **任务**：为你刚才切分出来的每一个“小块”打上语法标签。
+- **操作**：在每个句子块旁边的下拉菜单中，选择它对应的语法成分（例如：主干、定语从句、状语从句等）。
+- **目的**：在理清边界后，明确每个模块在整个句子中扮演的语法角色。
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+### 阶段三：综合回顾与翻译 (Review & Translation)
+- **进入**：完成阶段二后，点击“完成标记，查看翻译”。
+- **任务**：对比标准答案，并查看翻译。
+- **操作**：系统将展示标准的切分方式、正确的语法成分标签，以及每个小块的对应翻译和整句的完整翻译。你可以对比自己的理解，并在彻底明白结构后再去体会翻译的精妙。
+
+## 本地运行指南
+
+确保你的电脑上已经安装了 [Node.js](https://nodejs.org/)。
+
+1. **进入项目目录**
+   打开终端（命令行），进入 `sentence-parser` 文件夹。
+   ```bash
+   cd sentence-parser
+   ```
+
+2. **安装依赖**
+   ```bash
+   npm install
+   ```
+
+3. **启动本地开发服务器**
+   ```bash
+   npm run dev
+   ```
+
+4. **开始练习**
+   在浏览器中打开终端显示的本地地址（通常是 `http://localhost:5173/`），即可开始长难句拆分练习！
+
+## 技术栈
+- React + TypeScript
+- Vite
+- Tailwind CSS v4
