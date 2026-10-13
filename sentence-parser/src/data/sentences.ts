@@ -13,6 +13,7 @@ export interface SentenceData {
   chunks: SentenceChunk[];
   fullTranslation: string;
   difficulty: 'Easy' | 'Medium' | 'Hard';
+  coreVocabulary?: { word: string; translation: string }[];
 }
 
 export const SENTENCE_TAGS = [
@@ -37,6 +38,9 @@ export const sampleSentences: SentenceData[] = [
     difficulty: 'Medium',
     fullText: 'Many people find it difficult to stop looking at their phones, even when they are trying to focus on something else.',
     fullTranslation: '许多人发现很难停止看手机，即使当他们正努力专注于其他事情时也是如此。',
+    coreVocabulary: [
+      { word: 'focus on', translation: '集中注意力于...' }
+    ],
     chunks: [
       {
         id: 'c1',
@@ -65,6 +69,11 @@ export const sampleSentences: SentenceData[] = [
     difficulty: 'Medium',
     fullText: 'The idea that some groups of people may be more intelligent than others is one of those hypotheses that dare not speak its name.',
     fullTranslation: '某些人群可能比其他人群更聪明的观点，是那些不敢说出其名字（即不被公开承认）的假设之一。',
+    coreVocabulary: [
+      { word: 'intelligent', translation: '聪明的；智能的' },
+      { word: 'hypothesis (hypotheses)', translation: '假设；假说' },
+      { word: 'dare', translation: '敢于；胆敢' }
+    ],
     chunks: [
       {
         id: 'c1',
@@ -99,6 +108,13 @@ export const sampleSentences: SentenceData[] = [
     difficulty: 'Hard',
     fullText: 'Of all the changes that have taken place in English-language newspapers during the past quarter-century, perhaps the most far-reaching has been the inexorable decline in the scope and seriousness of their arts coverage.',
     fullTranslation: '在过去25年英文报纸发生的所有变化中，影响最深远的也许是其艺术报道在范围和严肃性方面不可阻挡的衰落。',
+    coreVocabulary: [
+      { word: 'far-reaching', translation: '影响深远的' },
+      { word: 'inexorable', translation: '不可阻挡的；无情的' },
+      { word: 'decline', translation: '衰落；下降' },
+      { word: 'scope', translation: '范围；视野' },
+      { word: 'coverage', translation: '新闻报道' }
+    ],
     chunks: [
       {
         id: 'c1',
