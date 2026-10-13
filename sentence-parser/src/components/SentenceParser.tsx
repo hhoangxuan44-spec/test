@@ -18,6 +18,21 @@ export const SentenceParser: React.FC = () => {
   // State for hints
   const [showHints, setShowHints] = useState(false);
 
+  // MOCK API STATE
+  const [isApiSynced, setIsApiSynced] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  // Mocking the data that would come from MaiMemo API (words the user ALREADY knows)
+  const knownWordsFromApi = useMemo(() => new Set(['many', 'people', 'find', 'it', 'to', 'stop', 'looking', 'at', 'their', 'phones', 'even', 'when', 'they', 'are', 'trying', 'on', 'something', 'else', 'the', 'idea', 'that', 'some', 'groups', 'of', 'may', 'be', 'more', 'than', 'others', 'is', 'one', 'those', 'not', 'speak', 'its', 'name', 'all', 'changes', 'have', 'taken', 'place', 'in', 'english', 'language', 'newspapers', 'during', 'past', 'quarter', 'century', 'perhaps', 'most', 'has', 'been', 'and', 'their', 'arts']), []);
+
+  const handleApiSync = () => {
+    setSyncing(true);
+    // Simulate API network delay
+    setTimeout(() => {
+      setSyncing(false);
+      setIsApiSynced(true);
+    }, 1500);
+  };
+
   // Reset state when sentence changes
   // We handle reset implicitly through the key prop or by lifting it out of useEffect,
   // but for simplicity in this interaction we'll clear it via navigation functions instead.
@@ -44,9 +59,35 @@ export const SentenceParser: React.FC = () => {
   const renderChunkingPhase = () => {
     const hintWords = new Set(['that', 'which', 'who', 'whom', 'whose', 'when', 'where', 'why', 'how', 'if', 'because', 'although', 'though', 'even', 'and', 'but', 'or', 'to', 'in', 'on', 'at', 'with', 'by', 'of', 'for', 'from']);
 
+    // Calculate unknown words stats for personalized targeted learning
+    let unknownCount = 0;
+    if (isApiSynced) {
+      words.forEach(w => {
+        const cw = w.toLowerCase().replace(/[^a-z]/g, '');
+        if (cw.length > 2 && !knownWordsFromApi.has(cw) && !hintWords.has(cw)) {
+          unknownCount++;
+        }
+      });
+    }
+
     return (
       <div>
-        <div className="mb-4 flex justify-end">
+        <div className="mb-4 flex justify-between items-center">
+          {isApiSynced ? (
+            <div className="flex flex-col gap-1">
+              <div className="text-sm text-purple-700 bg-purple-100 px-3 py-1 rounded-full border border-purple-300 inline-flex items-center gap-2">
+                🔗 墨墨词库已同步：已为你标红本句生词
+              </div>
+              <p className="text-xs text-gray-500 ml-2">
+                系统诊断：本句有 <strong>{unknownCount}</strong> 个生词。
+                {unknownCount === 0 && ' (无生词障碍，可完全专注语法结构)'}
+                {unknownCount > 0 && unknownCount <= 3 && ' (生词量适中，是最理想的「最近发展区」训练材料)'}
+                {unknownCount > 3 && ' (生词偏多，建议先扫清标红词汇再进行切分)'}
+              </p>
+            </div>
+          ) : (
+            <div></div>
+          )}
           <button
             onClick={() => setShowHints(!showHints)}
             className={`px-3 py-1 rounded text-sm ${showHints ? 'bg-yellow-100 text-yellow-800 border border-yellow-300' : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'}`}
@@ -58,9 +99,14 @@ export const SentenceParser: React.FC = () => {
           {words.map((word, idx) => {
             const cleanWord = word.toLowerCase().replace(/[^a-z]/g, '');
             const isHint = showHints && hintWords.has(cleanWord);
+
+            // Check if it's an unknown word based on mock API
+            const cleanWordForApi = word.toLowerCase().replace(/[^a-z]/g, '');
+            const isUnknown = isApiSynced && cleanWordForApi.length > 2 && !knownWordsFromApi.has(cleanWordForApi) && !hintWords.has(cleanWordForApi);
+
             return (
               <React.Fragment key={idx}>
-                <span className={`px-1 rounded ${isHint ? 'bg-yellow-200 font-bold' : ''}`}>{word}</span>
+                <span className={`px-1 rounded ${isHint ? 'bg-yellow-200 font-bold' : ''} ${isUnknown ? 'text-red-600 underline decoration-red-300 decoration-2 underline-offset-4' : ''}`}>{word}</span>
                 {idx < words.length - 1 && (
                   <span
                     className={`cursor-pointer px-2 text-2xl font-bold select-none transition-colors duration-200 ${splitIndices.has(idx) ? 'text-red-500' : 'text-transparent hover:text-red-300'}`}
@@ -166,9 +212,24 @@ export const SentenceParser: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
-      <div className="mb-4 flex items-center gap-2 bg-blue-50 text-blue-800 px-4 py-2 rounded-lg border border-blue-200">
-        <span className="text-xl">🏃</span>
-        <span className="font-medium text-sm">考前 2 个月冲刺模式已开启：强化核心真题，聚焦重难点结构！</span>
+      <div className="mb-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 bg-blue-50 text-blue-800 px-4 py-3 rounded-lg border border-blue-200">
+        <div className="flex items-center gap-2">
+          <span className="text-xl">🏃</span>
+          <span className="font-medium text-sm">考前 2 个月冲刺模式已开启：已接入智能生词过滤系统！</span>
+        </div>
+        {!isApiSynced ? (
+          <button
+            onClick={handleApiSync}
+            disabled={syncing}
+            className="flex items-center gap-2 px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded shadow transition-colors disabled:opacity-70"
+          >
+            {syncing ? '🔄 正在同步墨墨词库...' : '📲 一键同步墨墨 API 词库'}
+          </button>
+        ) : (
+          <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded border border-green-300">
+            ✅ 词库同步成功 (词汇量: 4502)
+          </span>
+        )}
       </div>
       <header className="mb-6 flex justify-between items-center border-b pb-4">
         <div>
