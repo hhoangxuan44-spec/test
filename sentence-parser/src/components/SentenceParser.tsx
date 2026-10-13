@@ -15,6 +15,9 @@ export const SentenceParser: React.FC = () => {
   // State for tagging phase
   const [userTags, setUserTags] = useState<Record<number, string>>({});
 
+  // State for hints
+  const [showHints, setShowHints] = useState(false);
+
   // Reset state when sentence changes
   // We handle reset implicitly through the key prop or by lifting it out of useEffect,
   // but for simplicity in this interaction we'll clear it via navigation functions instead.
@@ -25,6 +28,7 @@ export const SentenceParser: React.FC = () => {
     setSplitIndices(new Set());
     setUserTags({});
     setPhase('chunking');
+    setShowHints(false);
   };
 
   const toggleSplit = (index: number) => {
@@ -38,22 +42,43 @@ export const SentenceParser: React.FC = () => {
   };
 
   const renderChunkingPhase = () => {
+    const hintWords = new Set(['that', 'which', 'who', 'whom', 'whose', 'when', 'where', 'why', 'how', 'if', 'because', 'although', 'though', 'even', 'and', 'but', 'or', 'to', 'in', 'on', 'at', 'with', 'by', 'of', 'for', 'from']);
+
     return (
-      <div className="p-6 bg-gray-50 border rounded-lg min-h-[200px] flex flex-wrap items-center gap-y-4 text-xl leading-relaxed">
-        {words.map((word, idx) => (
-          <React.Fragment key={idx}>
-            <span className="px-1">{word}</span>
-            {idx < words.length - 1 && (
-              <span
-                className={`cursor-pointer px-2 text-2xl font-bold select-none transition-colors duration-200 ${splitIndices.has(idx) ? 'text-red-500' : 'text-transparent hover:text-red-300'}`}
-                onClick={() => toggleSplit(idx)}
-                title="Click to split"
-              >
-                /
-              </span>
-            )}
-          </React.Fragment>
-        ))}
+      <div>
+        <div className="mb-4 flex justify-end">
+          <button
+            onClick={() => setShowHints(!showHints)}
+            className={`px-3 py-1 rounded text-sm ${showHints ? 'bg-yellow-100 text-yellow-800 border border-yellow-300' : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'}`}
+          >
+            💡 {showHints ? '隐藏标志词' : '找断句标志词'}
+          </button>
+        </div>
+        <div className="p-6 bg-gray-50 border rounded-lg min-h-[200px] flex flex-wrap items-center gap-y-4 text-xl leading-relaxed">
+          {words.map((word, idx) => {
+            const cleanWord = word.toLowerCase().replace(/[^a-z]/g, '');
+            const isHint = showHints && hintWords.has(cleanWord);
+            return (
+              <React.Fragment key={idx}>
+                <span className={`px-1 rounded ${isHint ? 'bg-yellow-200 font-bold' : ''}`}>{word}</span>
+                {idx < words.length - 1 && (
+                  <span
+                    className={`cursor-pointer px-2 text-2xl font-bold select-none transition-colors duration-200 ${splitIndices.has(idx) ? 'text-red-500' : 'text-transparent hover:text-red-300'}`}
+                    onClick={() => toggleSplit(idx)}
+                    title="Click to split"
+                  >
+                    /
+                  </span>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+        {showHints && (
+          <p className="text-sm text-yellow-700 mt-2">
+            * 标黄的词（如连词、介词、关系代词）通常是意群的起点，考虑在它们**前面**切一刀哦！
+          </p>
+        )}
       </div>
     );
   };
@@ -179,6 +204,7 @@ export const SentenceParser: React.FC = () => {
             setSplitIndices(new Set());
             setUserTags({});
             setPhase('chunking');
+            setShowHints(false);
           }} className="px-6 py-2 bg-gray-600 text-white rounded shadow hover:bg-gray-700">
             重新练习此句
           </button>
