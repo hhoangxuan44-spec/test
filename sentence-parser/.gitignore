@@ -12,6 +12,10 @@ dist
 dist-ssr
 *.local
 
+# Local data: tokens, API keys and practice history
+data/
+.env
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
